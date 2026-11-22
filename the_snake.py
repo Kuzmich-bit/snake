@@ -38,7 +38,7 @@ class GameObject:
         self.position = position
         self.body_color = body_color
 
-    def draw(self):
+    def draw(self, surface):
         """Метод отрисовки объекта. Переопределяется в дочерних классах."""
         pass
 
@@ -52,7 +52,7 @@ class Apple(GameObject):
         self.randomize_position(snake_positions)
 
     def randomize_position(self, snake_positions=None):
-        """Устанавливает случайное положение яблока на игровом поле."""
+        """Устанавливает случайное положение яблока на поле."""
         if snake_positions is None:
             snake_positions = []
         while True:
@@ -64,11 +64,11 @@ class Apple(GameObject):
                 self.position = position
                 break
 
-    def draw(self):
+    def draw(self, surface):
         """Отрисовывает яблоко на игровой поверхности."""
         rect = pygame.Rect(self.position, (GRID_SIZE, GRID_SIZE))
-        pygame.draw.rect(screen, self.body_color, rect)
-        pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
+        pygame.draw.rect(surface, self.body_color, rect)
+        pygame.draw.rect(surface, BORDER_COLOR, rect, 1)
 
 
 class Snake(GameObject):
@@ -98,21 +98,21 @@ class Snake(GameObject):
     def move(self):
         """Обновляет позицию змейки."""
         head_x, head_y = self.get_head_position()
-        direction_x, direction_y = self.direction
+        dir_x, dir_y = self.direction
         new_head = (
-            (head_x + direction_x * GRID_SIZE) % SCREEN_WIDTH,
-            (head_y + direction_y * GRID_SIZE) % SCREEN_HEIGHT,
+            (head_x + dir_x * GRID_SIZE) % SCREEN_WIDTH,
+            (head_y + dir_y * GRID_SIZE) % SCREEN_HEIGHT,
         )
         self.positions.insert(0, new_head)
         if len(self.positions) > self.length:
             self.positions.pop()
 
-    def draw(self):
+    def draw(self, surface):
         """Отрисовывает змейку на экране, затирая след."""
         for position in self.positions:
             rect = pygame.Rect(position, (GRID_SIZE, GRID_SIZE))
-            pygame.draw.rect(screen, self.body_color, rect)
-            pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
+            pygame.draw.rect(surface, self.body_color, rect)
+            pygame.draw.rect(surface, BORDER_COLOR, rect, 1)
 
     def reset(self):
         """Сбрасывает змейку в начальное состояние."""
@@ -161,8 +161,8 @@ def main():
             apple.randomize_position(snake.positions)
 
         screen.fill(BOARD_BACKGROUND_COLOR)
-        snake.draw()
-        apple.draw()
+        snake.draw(screen)
+        apple.draw(screen)
         pygame.display.update()
 
         clock.tick(SPEED)
